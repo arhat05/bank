@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankingApp</title>
+    <style>
+        /* CSS for the nav bar */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+
+        .navbar {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            color: #0000ff;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .navbar-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar-button {
+            background-color: #0000ff;
+            color: #ffffff;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .navbar-button:hover {
+            transform: scale(1.1); /* Increase button size on hover */
+        }
+
+        .navbar-button:hover a {
+            font-weight: bold; /* Make text bold on hover */
+        }
+
+        .navbar-button a {
+            color: #ffffff; /* Set text color to white */
+            text-decoration: none; /* Remove underline from links */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <h3>ABC Bank</h3>
+        </div>
+        <div class="navbar-buttons">
+            <button class="navbar-button" type="submit">
+                <a href="/signup">Register</a>
+            </button>
+            <button class="navbar-button" type="submit">
+                <a href="/login">Log in</a>
+            </button>
+            <button class="navbar-button" type="submit">
+                <a href="/signout">Sign Out</a>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Rest of your content -->
+
+</body>
+</html>
