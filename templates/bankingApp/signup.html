@@ -65,31 +65,32 @@
 <body>
     <div class="container">
         <h3>Sign Up</h3>
-        <form action = "" method="POST">
+        <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        <form action="/signup" method="POST">
             {% csrf_token %}
             <div class="form-group">
                 <label for="firstName">First Name: </label>
-                <input type="text" id="firstname" name="firstname" required, placeholder="Enter your first name">
+                <input type="text" id="firstname" name="firstname" required placeholder="Enter your first name">
             </div>
             <div class="form-group">
                 <label for="lastName">Last Name:</label>
-                <input type="text" id="lastname" name="lastname" required, placeholder="Enter your last name">
+                <input type="text" id="lastname" name="lastname" required placeholder="Enter your last name">
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required, placeholder="Enter your email">
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
             </div>
             <div class="form-group">
-                <label for="username">User Name:</label>
-                <input type="text" id="username" name="username" required, placeholder="Create a username!">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required placeholder="Create a username!">
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required, placeholder="Create secure password">
+                <input type="password" id="password" name="password" required placeholder="Create secure password">
             </div>
             <div class="form-group">
-                <label for="confirmpassword">Comfirm Password:</label>
-                <input type="password" id="confirmpassword" name="confirmpassword" required, placeholder="Re-type your password">
+                <label for="confirmpassword">Confirm Password:</label>
+                <input type="password" id="confirmpassword" name="confirmpassword" required placeholder="Re-type your password">
             </div>
             <button type="submit">Sign Up</button>
         </form>

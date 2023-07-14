@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from .models import Customer
 from django.contrib import messages
 import time
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth import login as auth_login
 
 # Create your views here.
 
@@ -23,6 +26,7 @@ def signup(request):
         confirm_password = request.POST['confirmpassword']
         
         if password1 == confirm_password:
+            
             customer = Customer(
             firstname=firstname,
             lastname=lastname,
@@ -32,20 +36,48 @@ def signup(request):
 
             customer.save()
             
-            messages.success(request, 'Account created successfully! Login to continue.')
+            user = User.objects.create_user(username=username, password=password1)
+            user.email = email
+            user.first_name = firstname
+            user.last_name = lastname
             
-            time.sleep(5)
+            user.save()
+            
+            
+            messages.success(request, "Account created successfully! Login to continue.")
+            
+            time.sleep(2)
             
             return redirect('login')
         else:
-            return messages.error(request, 'Passwords do not match!')
+            messages.error(request, 'Passwords do not match!')
+            return render(request, 'bankingApp/signup.html')
         
         
         
     return render(request, 'bankingApp/signup.html')
 
 
+
 def login(request):
+    
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        
+        user = authenticate(username=username, password=password)
+        
+        
+        if user is not None:
+            auth_login(request, user)
+            name = user.first_name + "!"
+            
+            return render(request, 'bankingApp/index.html', {'name': name})
+        
+        else:
+            messages.error(request, 'Invalid credentials!')
+            return redirect('dahsboard')
+    
     return render(request, 'bankingApp/login.html')
 
 def signout(request):
