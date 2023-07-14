@@ -25,6 +25,10 @@ def signup(request):
         password1 = request.POST['password']
         confirm_password = request.POST['confirmpassword']
         
+        if User.objects.filter(username=username):
+            messages.error(request, 'Username already exists!')
+            return redirect('signup')
+        
         if password1 == confirm_password:
             
             customer = Customer(
@@ -76,9 +80,11 @@ def login(request):
         
         else:
             messages.error(request, 'Invalid credentials!')
-            return redirect('dahsboard')
+            return redirect('dashboard')
     
     return render(request, 'bankingApp/login.html')
 
 def signout(request):
-    pass
+    logout(request)
+    messages.success(request, 'Logged out successfully!')
+    return redirect('dashboard')
