@@ -80,6 +80,7 @@
     <div class="container">
         <h3>Sign Up</h3>
         <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        <p>Or go back to<a href="{% url 'dashboard' %}"> home</a></p>
         <form action="/signup" method="POST">
             {% csrf_token %}
             <div class="form-group">
