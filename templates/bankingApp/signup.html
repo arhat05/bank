@@ -4,15 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f1f1f1;
+            background-image: url('https://images.pexels.com/photos/3137068/pexels-photo-3137068.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); /* Replace 'https://example.com/your-image.jpg' with the URL of your background image */
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
 
         .container {
             max-width: 400px;
-            margin: 0 auto;
             padding: 20px;
             background-color: #ffffff;
             border-radius: 4px;
@@ -35,10 +42,7 @@
         }
 
         input[type="text"],
-        input[type="text"],
         input[type="email"],
-        input[type="text"],
-        input[type="password"],
         input[type="password"] {
             width: 100%;
             padding: 8px;
@@ -50,7 +54,7 @@
         button {
             width: 100%;
             padding: 10px;
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: #ffffff;
             border: none;
             border-radius: 4px;
@@ -58,18 +62,18 @@
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role = "alert">
-    <strong>Message: </strong> {{ message }}
-    <button type = "button" class = "close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden = "true">&times;</span>
-    </button>
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>Message: </strong> {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     {% endfor %}
 
@@ -79,7 +83,7 @@
         <form action="/signup" method="POST">
             {% csrf_token %}
             <div class="form-group">
-                <label for="firstName">First Name: </label>
+                <label for="firstName">First Name:</label>
                 <input type="text" id="firstname" name="firstname" required placeholder="Enter your first name">
             </div>
             <div class="form-group">
@@ -92,11 +96,11 @@
             </div>
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required placeholder="Create a username!">
+                <input type="text" id="username" name="username" required placeholder="Create a username">
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Create secure password">
+                <input type="password" id="password" name="password" required placeholder="Create a secure password">
             </div>
             <div class="form-group">
                 <label for="confirmpassword">Confirm Password:</label>
@@ -105,5 +109,9 @@
             <button type="submit">Sign Up</button>
         </form>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

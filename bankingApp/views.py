@@ -74,9 +74,9 @@ def login(request):
         
         if user is not None:
             auth_login(request, user)
-            name = user.first_name + "!"
+            first_name = user.first_name
             
-            return render(request, 'bankingApp/index.html', {'name': name})
+            return render(request, 'bankingApp/index.html', {'first_name': first_name})
         
         else:
             messages.error(request, 'Invalid credentials!')
