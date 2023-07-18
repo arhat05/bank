@@ -1,6 +1,8 @@
+from datetime import timezone
+import datetime
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
-from .models import Customer
+from .models import *
 from django.contrib import messages
 import time
 from django.contrib.auth.models import User
@@ -40,10 +42,31 @@ def signup(request):
 
             customer.save()
             
+            # create 4 accounts for the customer of each type
+          
+            account1 = Account(account_type="checking", customer_id=customer)
+            account1.save()
+            
+            account2 = Account(account_type="savings", customer_id=customer)
+            account2.save()
+            
+            account3 = Account(account_type="credit_card", customer_id=customer, interest_rate=20.5)
+            account3.save()
+            
+            account4 = Account(account_type="loan", customer_id=customer, interest_rate=19)
+            account4.save()
+            
             user = User.objects.create_user(username=username, password=password1)
             user.email = email
             user.first_name = firstname
             user.last_name = lastname
+            user.id = customer.customer_id
+            
+            # user.checking_account_num = Account.objects.get(account_type="checking", customer_id=customer.customer_id).account_number
+            # user.checking_account_balance = Account.objects.get(account_type="checking", customer_id=customer.customer_id).balance
+            # user.savings_account_num = Account.objects.get(account_type="savings", customer_id=customer.customer_id).account_number
+            # user.savings_account_balance = Account.objects.get(account_type="savings", customer_id=customer.customer_id).balance
+            
             
             user.save()
             
@@ -71,13 +94,33 @@ def login(request):
         
         user = authenticate(username=username, password=password)
         
+        customer = Customer.objects.get(username=username)
         
         if user is not None:
             auth_login(request, user)
             first_name = user.first_name
             
-            return render(request, 'bankingApp/index.html', {'first_name': first_name})
-        
+            checking_acc = Account.objects.get(account_type="checking", customer_id=customer.customer_id)
+            savings_acc = Account.objects.get(account_type="savings", customer_id=customer.customer_id)
+            cc_acc = Account.objects.get(account_type="credit_card", customer_id=customer.customer_id)
+            loan_acc = Account.objects.get(account_type="loan", customer_id=customer.customer_id)
+            
+            
+            checking_account_num = checking_acc.account_number
+            checking_account_balance = checking_acc.balance
+            
+            return render(request, 'bankingApp/index.html', {
+                'first_name': first_name,
+                'checking_account_num': checking_account_num,
+                'checking_account_balance': checking_account_balance,
+                'savings_account_num': savings_acc.account_number,
+                'savings_account_balance': savings_acc.balance,
+                'cc_account_num': cc_acc.account_number,
+                'cc_account_balance': cc_acc.balance,
+                'loan_account_num': loan_acc.account_number,
+                'loan_account_balance': loan_acc.balance
+            })
+
         else:
             messages.error(request, 'Invalid credentials!')
             return redirect('dashboard')

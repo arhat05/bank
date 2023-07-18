@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 # Create your models here.
@@ -28,12 +29,12 @@ class Account(models.Model):
     ]
 
     account_number = models.AutoField(primary_key=True)
-    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPE_CHOICES),
-    date_opened = models.DateField()
-    balance = models.DecimalField(max_digits=10, decimal_places=2)
-    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    overdraft_lim = models.DecimalField(max_digits=10, decimal_places=2)
-    interest_rate = models.DecimalField(max_digits=10, decimal_places=2)
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPE_CHOICES, default='checking')
+    date_opened = models.DateField(default=datetime.date.today)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE, default=1)
+    overdraft_lim = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    interest_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
 
 class Loan(models.Model):
