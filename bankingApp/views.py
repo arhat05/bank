@@ -23,13 +23,23 @@ def dashboard(request):
         
         
         checking_account_num = checking_acc.account_number
-        checking_account_balance = checking_acc.balance
         checking_transactions = Check.objects.filter(account_number=checking_account_num)
+        checking_account_balance = checking_acc.balance
+        
+        running_balance = 0
+        
         for transaction in checking_transactions:
             if transaction.transaction_type == 'credit':
-                checking_account_balance += transaction.transaction_amount
+                running_balance += transaction.transaction_amount
             elif transaction.transaction_type == 'debit':
-                checking_account_balance -= transaction.transaction_amount
+                running_balance -= transaction.transaction_amount
+        
+        checking_acc.balance = running_balance
+        checking_acc.save()
+        
+        
+
+        
                 
         savings_account_num = savings_acc.account_number
         savings_account_balance = savings_acc.balance
@@ -150,11 +160,18 @@ def login(request):
             checking_account_num = checking_acc.account_number
             checking_account_balance = checking_acc.balance
             checking_transactions = Check.objects.filter(account_number=checking_account_num)
+            
+            
+            running_balance = 0
+            
             for transaction in checking_transactions:
                 if transaction.transaction_type == 'credit':
-                    checking_account_balance += transaction.transaction_amount
+                    running_balance += transaction.transaction_amount
                 elif transaction.transaction_type == 'debit':
-                    checking_account_balance -= transaction.transaction_amount
+                    running_balance -= transaction.transaction_amount
+            
+            checking_acc.balance = running_balance
+            checking_acc.save()
                     
             savings_account_num = savings_acc.account_number
             savings_account_balance = savings_acc.balance
@@ -198,7 +215,7 @@ def checkingaccount(request):
     
     #set the account balance to the sum of all transactions and the initial balance
     
-    balance = account.balance
+    balance = 0
     for transaction in transactions:
         if transaction.transaction_type == 'credit':
             balance += transaction.transaction_amount
@@ -206,6 +223,7 @@ def checkingaccount(request):
             balance -= transaction.transaction_amount
             
     account.balance = balance
+    account.save()
     
 
     return render(request, 'bankingApp/checkingaccount.html', {'account': account, 'transactions': transactions})
