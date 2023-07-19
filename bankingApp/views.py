@@ -108,13 +108,30 @@ def login(request):
             
             checking_account_num = checking_acc.account_number
             checking_account_balance = checking_acc.balance
+            checking_transactions = Check.objects.filter(account_number=checking_account_num)
+            for transaction in checking_transactions:
+                if transaction.transaction_type == 'credit':
+                    checking_account_balance += transaction.transaction_amount
+                elif transaction.transaction_type == 'debit':
+                    checking_account_balance -= transaction.transaction_amount
+                    
+            savings_account_num = savings_acc.account_number
+            savings_account_balance = savings_acc.balance
+            savings_transactions = Saving.objects.filter(account_number=savings_account_num)
+            
+            for transaction in savings_transactions:
+                if transaction.transaction_type == 'credit':
+                    savings_account_balance += transaction.transaction_amount
+                elif transaction.transaction_type == 'debit':
+                    savings_account_balance -= transaction.transaction_amount
+            
             
             return render(request, 'bankingApp/index.html', {
                 'first_name': first_name,
                 'checking_account_num': checking_account_num,
                 'checking_account_balance': checking_account_balance,
-                'savings_account_num': savings_acc.account_number,
-                'savings_account_balance': savings_acc.balance,
+                'savings_account_num': savings_account_num,
+                'savings_account_balance': savings_account_balance,
                 'cc_account_num': cc_acc.account_number,
                 'cc_account_balance': cc_acc.balance,
                 'loan_account_num': loan_acc.account_number,
@@ -131,3 +148,43 @@ def signout(request):
     logout(request)
     messages.success(request, 'Logged out successfully!')
     return redirect('dashboard')
+
+
+def checkingaccount(request):
+    account = Account.objects.get(account_type="checking", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+    accNum = account.account_number
+    transactions = Check.objects.filter(account_number=accNum)
+    
+    #set the account balance to the sum of all transactions and the initial balance
+    
+    balance = account.balance
+    for transaction in transactions:
+        if transaction.transaction_type == 'credit':
+            balance += transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            balance -= transaction.transaction_amount
+            
+    account.balance = balance
+    
+
+    return render(request, 'bankingApp/checkingaccount.html', {'account': account, 'transactions': transactions})
+
+def savingsaccount(request):
+    account = Account.objects.get(account_type="savings", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+    accNum = account.account_number
+    transactions = Saving.objects.filter(account_number=accNum)
+    
+    #set the account balance to the sum of all transactions and the initial balance
+    
+    balance = account.balance
+    for transaction in transactions:
+        if transaction.transaction_type == 'credit':
+            balance += transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            balance -= transaction.transaction_amount
+            
+    account.balance = balance
+    
+
+    return render(request, 'bankingApp/savingsaccount.html', {'account': account, 'transactions': transactions})
+

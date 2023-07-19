@@ -51,6 +51,7 @@ class Loan(models.Model):
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     loan_term = models.IntegerField()
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 
 
 class Saving(models.Model):
@@ -65,6 +66,7 @@ class Saving(models.Model):
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     transaction_desc = models.CharField(max_length=100)
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='credit')
 
 
 class Check(models.Model):
@@ -79,6 +81,7 @@ class Check(models.Model):
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     transaction_desc = models.CharField(max_length=100)
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 
 
 class CreditCard(models.Model):
@@ -97,5 +100,6 @@ class CreditCard(models.Model):
     next_payment_date = models.DateField()
     credit_limit = models.DecimalField(max_digits=10, decimal_places=2)
     minimum_payment = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 
     
