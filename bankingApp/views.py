@@ -12,7 +12,48 @@ from django.contrib.auth import login as auth_login
 # Create your views here.
 
 def dashboard(request):
-
+    
+    if request.user.is_authenticated:
+        first_name = request.user.first_name
+            
+        checking_acc = Account.objects.get(account_type="checking", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+        savings_acc = Account.objects.get(account_type="savings", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+        cc_acc = Account.objects.get(account_type="credit_card", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+        loan_acc = Account.objects.get(account_type="loan", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+        
+        
+        checking_account_num = checking_acc.account_number
+        checking_account_balance = checking_acc.balance
+        checking_transactions = Check.objects.filter(account_number=checking_account_num)
+        for transaction in checking_transactions:
+            if transaction.transaction_type == 'credit':
+                checking_account_balance += transaction.transaction_amount
+            elif transaction.transaction_type == 'debit':
+                checking_account_balance -= transaction.transaction_amount
+                
+        savings_account_num = savings_acc.account_number
+        savings_account_balance = savings_acc.balance
+        savings_transactions = Saving.objects.filter(account_number=savings_account_num)
+        
+        for transaction in savings_transactions:
+            if transaction.transaction_type == 'credit':
+                savings_account_balance += transaction.transaction_amount
+            elif transaction.transaction_type == 'debit':
+                savings_account_balance -= transaction.transaction_amount
+        
+        
+        return render(request, 'bankingApp/index.html', {
+            'first_name': first_name,
+            'checking_account_num': checking_account_num,
+            'checking_account_balance': checking_account_balance,
+            'savings_account_num': savings_account_num,
+            'savings_account_balance': savings_account_balance,
+            'cc_account_num': cc_acc.account_number,
+            'cc_account_balance': cc_acc.balance,
+            'loan_account_num': loan_acc.account_number,
+            'loan_account_balance': loan_acc.balance
+        })
+        
     
     return render(request, 'bankingApp/index.html')
 
@@ -27,7 +68,7 @@ def signup(request):
         password1 = request.POST['password']
         confirm_password = request.POST['confirmpassword']
         
-        if User.objects.filter(username=username):
+        if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already exists!')
             return redirect('signup')
         
@@ -60,7 +101,7 @@ def signup(request):
             user.email = email
             user.first_name = firstname
             user.last_name = lastname
-            user.id = customer.customer_id
+            #user.id = customer.customer_id
             
             # user.checking_account_num = Account.objects.get(account_type="checking", customer_id=customer.customer_id).account_number
             # user.checking_account_balance = Account.objects.get(account_type="checking", customer_id=customer.customer_id).balance
