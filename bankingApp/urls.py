@@ -9,5 +9,6 @@ urlpatterns = [
     path('signout', views.signout, name='signout'),
     path('checkingaccount', views.checkingaccount, name='checkingaccount'),
     path('savingsaccount', views.savingsaccount, name='savingsaccount'),
+    path('creditcard', views.creditcard, name='creditcard'),
     
 ]

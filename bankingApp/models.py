@@ -62,7 +62,6 @@ class Saving(models.Model):
     
     account_number = models.ForeignKey(Account, on_delete=models.CASCADE)
     transaction_id = models.AutoField(primary_key=True)
-    principal = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     transaction_desc = models.CharField(max_length=100)
@@ -77,7 +76,7 @@ class Check(models.Model):
     
     account_number = models.ForeignKey(Account, on_delete=models.CASCADE)
     transaction_id = models.AutoField(primary_key=True)
-    principal = models.DecimalField(max_digits=10, decimal_places=2)
+    principal = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     transaction_desc = models.CharField(max_length=100)
@@ -92,7 +91,6 @@ class CreditCard(models.Model):
     
     account_number = models.ForeignKey(Account, on_delete=models.CASCADE)
     transaction_id = models.AutoField(primary_key=True)
-    principal = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     transaction_desc = models.CharField(max_length=100)

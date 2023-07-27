@@ -241,9 +241,13 @@ def savingsaccount(request):
             balance += transaction.transaction_amount
         elif transaction.transaction_type == 'debit':
             balance -= transaction.transaction_amount
-            
+    
+    interest = balance * account.interest_rate/100
+    balance += interest
     account.balance = balance
     
 
     return render(request, 'bankingApp/savingsaccount.html', {'account': account, 'transactions': transactions})
 
+def creditcard(request):
+    return render(request, 'bankingApp/creditcard.html')
