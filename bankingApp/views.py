@@ -8,6 +8,7 @@ import time
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -183,6 +184,15 @@ def login(request):
                 elif transaction.transaction_type == 'debit':
                     savings_account_balance -= transaction.transaction_amount
             
+            cc_acc_num = cc_acc.account_number
+            cc_acc_balance = cc_acc.balance
+            cc_transactions = CreditCard.objects.filter(account_number=cc_acc_num)
+            
+            for transaction in cc_transactions:
+                if transaction.transaction_type == 'credit':
+                    savings_account_balance += transaction.transaction_amount
+                elif transaction.transaction_type == 'debit':
+                    savings_account_balance -= transaction.transaction_amount
             
             return render(request, 'bankingApp/index.html', {
                 'first_name': first_name,
@@ -190,8 +200,8 @@ def login(request):
                 'checking_account_balance': checking_account_balance,
                 'savings_account_num': savings_account_num,
                 'savings_account_balance': savings_account_balance,
-                'cc_account_num': cc_acc.account_number,
-                'cc_account_balance': cc_acc.balance,
+                'cc_account_num': cc_acc_num,
+                'cc_account_balance': cc_acc_balance,
                 'loan_account_num': loan_acc.account_number,
                 'loan_account_balance': loan_acc.balance
             })
@@ -211,7 +221,7 @@ def signout(request):
 def checkingaccount(request):
     account = Account.objects.get(account_type="checking", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
     accNum = account.account_number
-    transactions = Check.objects.filter(account_number=accNum)
+    transactions = Check.objects.filter(account_number=accNum).order_by('-transaction_date')
     
     #set the account balance to the sum of all transactions and the initial balance
     
@@ -225,6 +235,12 @@ def checkingaccount(request):
     account.balance = balance
     account.save()
     
+    # paginate transactions 25 per page
+    paginator = Paginator(transactions, 25) 
+
+    # get current page number
+    page = request.GET.get('page')
+    transactions = paginator.get_page(page)
 
     return render(request, 'bankingApp/checkingaccount.html', {'account': account, 'transactions': transactions})
 
@@ -236,13 +252,14 @@ def savingsaccount(request):
     #set the account balance to the sum of all transactions and the initial balance
     
     balance = account.balance
+    interest = balance * account.interest_rate/100
     for transaction in transactions:
         if transaction.transaction_type == 'credit':
             balance += transaction.transaction_amount
         elif transaction.transaction_type == 'debit':
             balance -= transaction.transaction_amount
     
-    interest = balance * account.interest_rate/100
+    
     balance += interest
     account.balance = balance
     
@@ -250,4 +267,21 @@ def savingsaccount(request):
     return render(request, 'bankingApp/savingsaccount.html', {'account': account, 'transactions': transactions})
 
 def creditcard(request):
-    return render(request, 'bankingApp/creditcard.html')
+    account = Account.objects.get(account_type="credit_card", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+    accNum = account.account_number
+    transactions = CreditCard.objects.filter(account_number=accNum)
+    
+    #set the account balance to the sum of all transactions and the initial balance
+    
+    balance = account.balance
+    for transaction in transactions:
+        if transaction.transaction_type == 'credit':
+            balance += transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            balance -= transaction.transaction_amount
+    
+    
+    account.balance = balance
+    
+
+    return render(request, 'bankingApp/creditcard.html', {'account': account, 'transactions': transactions})

@@ -24,11 +24,35 @@
                 <tr>
                     <td>{{ transaction.transaction_date }}</td>
                     <td>{{ transaction.transaction_desc }}</td>
-                    <td>{{ transaction.transaction_amount }}</td>
+                    <td>
+                        {% if transaction.transaction_type == 'debit' %}
+                          -{{ transaction.transaction_amount }}
+                        {% else %}
+                          {{ transaction.transaction_amount }}
+                        {% endif %}
+                      </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        
+        {% if transactions.has_other_pages %}
+        <ul class="pagination">
+            {% if transactions.has_previous %}
+            <li><a href="?page={{ transactions.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+            {% endif %} 
+            {% for i in transactions.paginator.page_range %}
+            <li {% if transactions.number == i %}class="active"{% endif %}><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endfor %}
+            {% if transactions.has_next %}
+            <li><a href="?page={{ transactions.next_page_number }}">&raquo;</a></li>
+            {% else %}
+            <li class="disabled"><span>&raquo;</span></li>
+            {% endif %}
+        </ul>
+        {% endif %}
 
         <p>Back to <a href="{% url 'dashboard' %}"> home</a></p>
     </div>
