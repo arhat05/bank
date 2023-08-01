@@ -53,6 +53,12 @@
             text-decoration: none; /* Remove underline from links */
         }
 
+        .card {
+            width: 400px;
+            height: 130px;
+            margin: 5px;
+        }
+
         /* Center the content */
         body {
             display: flex;
@@ -98,39 +104,50 @@
     <div class="button-container">
         {% if user.is_authenticated %}
 
-        <div class="button-container">
+        <div class="d-flex flex-column card-container">
+            <a href="/checkingaccount">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Checking Account</h5>
                     <p class="card-text">Balance: ${{ checking_account_balance }}</p>
                     <p class="card-text">Account Number: {{ checking_account_num }}</p>
-                    <a href="/checkingaccount" class="btn btn-primary">View Details</a>
+                    <!--<a href="/checkingaccount" class="btn btn-primary">View Details</a> -->
                 </div>
+            </a>
+            
+            <a href="/savingsaccount">
             </div>
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Savings Account</h5>
                     <p class="card-text">Balance: ${{ savings_account_balance }}</p>
                     <p class="card-text">Account Number: {{ savings_account_num }}</p>
-                    <a href="/savingsaccount" class="btn btn-primary">View Details</a>
+                    <!--<a href="/savingsaccount" class="btn btn-primary">View Details</a> -->
                 </div>
             </div>
+            </a>
+
+            <a href="/creditcard">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Credit Card</h5>
                     <p class="card-text">Balance: ${{ cc_account_balance }}</p>
                     <p class="card-text">Account Number: {{ cc_account_num }}</p>
-                    <a href="/creditcard" class="btn btn-primary">View Details</a>
+                    <!-- <a href="/creditcard" class="btn btn-primary">View Details</a> -->
                 </div>
             </div>
+            </a>
+
+            <a href="/checkingaccount">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Loan Account</h5>
                     <p class="card-text">Balance: ${{ loan_account_balance }}</p>
                     <p class="card-text">Account Number: {{ loan_account_num }}</p>
-                    <a href="/checkingaccount" class="btn btn-primary">View Details</a>
+                    <!-- <a href="/checkingaccount" class="btn btn-primary">View Details</a> -->
                 </div>
             </div>
+            </a>
 
         <button class="regular-button" type="submit">
             <a href="/signout">Sign Out</a>
