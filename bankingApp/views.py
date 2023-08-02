@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
 from django.core.paginator import Paginator
+from decimal import Decimal
 
 # Create your views here.
 
@@ -102,7 +103,7 @@ def signup(request):
             account2 = Account(account_type="savings", customer_id=customer)
             account2.save()
             
-            account3 = Account(account_type="credit_card", customer_id=customer, interest_rate=20.5)
+            account3 = Account(account_type="credit_card", customer_id=customer, interest_rate=20.5, credit_limit=1000)
             account3.save()
             
             account4 = Account(account_type="loan", customer_id=customer, interest_rate=19)
@@ -123,7 +124,7 @@ def signup(request):
             user.save()
             
             
-            messages.success(request, "Account created successfully! Login to continue.")
+            messages.success(request, "Account created successfully!")
             
             time.sleep(2)
             
@@ -178,21 +179,47 @@ def login(request):
             savings_account_balance = savings_acc.balance
             savings_transactions = Saving.objects.filter(account_number=savings_account_num)
             
+            running_balance = 0
+            
             for transaction in savings_transactions:
                 if transaction.transaction_type == 'credit':
-                    savings_account_balance += transaction.transaction_amount
+                    running_balance += transaction.transaction_amount
                 elif transaction.transaction_type == 'debit':
-                    savings_account_balance -= transaction.transaction_amount
+                    running_balance -= transaction.transaction_amount
+            
+            savings_acc.balance = running_balance
+            savings_acc.save()
             
             cc_acc_num = cc_acc.account_number
             cc_acc_balance = cc_acc.balance
             cc_transactions = CreditCard.objects.filter(account_number=cc_acc_num)
             
+            running_balance = 0
+            
             for transaction in cc_transactions:
                 if transaction.transaction_type == 'credit':
-                    savings_account_balance += transaction.transaction_amount
+                    running_balance -= transaction.transaction_amount
                 elif transaction.transaction_type == 'debit':
-                    savings_account_balance -= transaction.transaction_amount
+                    running_balance += transaction.transaction_amount
+            
+            cc_acc.balance = running_balance
+            cc_acc.save()
+            
+            
+            loan_acc_num = loan_acc.account_number
+            loan_acc_balance = loan_acc.balance
+            loan_transactions = Loan.objects.filter(account_number=loan_acc_num)
+            
+            running_balance = 0
+            
+            for transaction in loan_transactions:
+                if transaction.transaction_type == 'credit':
+                    running_balance += transaction.transaction_amount
+                elif transaction.transaction_type == 'debit':
+                    running_balance -= transaction.transaction_amount
+            
+            loan_acc.balance = running_balance
+            loan_acc.save()
             
             return render(request, 'bankingApp/index.html', {
                 'first_name': first_name,
@@ -202,8 +229,8 @@ def login(request):
                 'savings_account_balance': savings_account_balance,
                 'cc_account_num': cc_acc_num,
                 'cc_account_balance': cc_acc_balance,
-                'loan_account_num': loan_acc.account_number,
-                'loan_account_balance': loan_acc.balance
+                'loan_account_num': loan_acc_num,
+                'loan_account_balance': loan_acc_balance
             })
 
         else:
@@ -272,8 +299,8 @@ def savingsaccount(request):
     
     #set the account balance to the sum of all transactions and the initial balance
     
-    balance = account.balance
-    interest = balance * account.interest_rate/100
+    balance = 0
+    #interest = balance * account.interest_rate/100
     for transaction in transactions:
         if transaction.transaction_type == 'credit':
             balance += transaction.transaction_amount
@@ -281,7 +308,7 @@ def savingsaccount(request):
             balance -= transaction.transaction_amount
     
     
-    balance += interest
+    #balance += interest
     account.balance = balance
     
     
@@ -320,6 +347,55 @@ def creditcard(request):
     
     #set the account balance to the sum of all transactions and the initial balance
     
+    balance = 0
+    for transaction in transactions:
+        if transaction.transaction_type == 'credit':
+            balance -= transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            balance += transaction.transaction_amount
+            
+    
+    account.balance = balance
+    
+    account.save()
+    
+    
+        
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Convert the start and end dates to Python date objects
+    if start_date:
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+    # Apply date filtering if start_date and end_date are valid
+    if start_date and end_date:
+        transactions = transactions.filter(transaction_date__range=[start_date, end_date])
+    elif start_date:
+        transactions = transactions.filter(transaction_date__gte=start_date)
+    elif end_date:
+        transactions = transactions.filter(transaction_date__lte=end_date)
+    
+    
+    # paginate transactions 25 per page
+    paginator = Paginator(transactions, 25) 
+
+    # get current page number
+    page = request.GET.get('page')
+    transactions = paginator.get_page(page)
+
+    return render(request, 'bankingApp/creditcard.html', {'account': account, 'transactions': transactions})
+
+def loan(request):
+    
+    account = Account.objects.get(account_type="loan", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+    accNum = account.account_number
+    transactions = CreditCard.objects.filter(account_number=accNum)
+    
+    #set the account balance to the sum of all transactions and the initial balance
+    
     balance = account.balance
     for transaction in transactions:
         if transaction.transaction_type == 'credit':
@@ -328,9 +404,81 @@ def creditcard(request):
             balance += transaction.transaction_amount
             
     
-    
-    
     account.balance = balance
     
+    account.save()
+    
+    
+        
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
 
-    return render(request, 'bankingApp/creditcard.html', {'account': account, 'transactions': transactions})
+    # Convert the start and end dates to Python date objects
+    if start_date:
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+    # Apply date filtering if start_date and end_date are valid
+    if start_date and end_date:
+        transactions = transactions.filter(transaction_date__range=[start_date, end_date])
+    elif start_date:
+        transactions = transactions.filter(transaction_date__gte=start_date)
+    elif end_date:
+        transactions = transactions.filter(transaction_date__lte=end_date)
+    
+    
+    # paginate transactions 25 per page
+    paginator = Paginator(transactions, 25) 
+
+    # get current page number
+    page = request.GET.get('page')
+    transactions = paginator.get_page(page)
+
+    return render(request, 'bankingApp/loan.html', {'account': account, 'transactions': transactions})
+
+def make_transaction(request):
+    if request.method == 'POST':
+        # Get the form data from the request
+        transaction_amount = Decimal(request.POST['transaction_amount'])
+        transaction_date = datetime.datetime.strptime(request.POST['transaction_date'], '%Y-%m-%d').date()
+        transaction_desc = request.POST['transaction_description']
+        transaction_type = request.POST['transaction_type']
+        account_type = request.POST['account_type']
+        
+        
+        account = Account.objects.get(account_type=account_type, customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+        #account = Account.objects.get(account_type="checking", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
+        
+        if account_type == 'checking':
+        # Create a new transaction object and save it
+            transaction = Check(account_number=account,
+                                transaction_date=transaction_date,
+                                transaction_desc=f"{transaction_desc}",
+                                transaction_type=transaction_type,
+                                transaction_amount=transaction_amount)
+            transaction.save()
+            
+        elif account_type == 'savings':
+            transaction = Saving(account_number=account,
+                                transaction_date=transaction_date,
+                                transaction_desc=f"{transaction_desc}",
+                                transaction_type=transaction_type,
+                                transaction_amount=transaction_amount)
+            transaction.save()
+
+        # Update the account balance based on the new transaction
+        if transaction.transaction_type == 'credit':
+            account.balance += transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            account.balance -= transaction.transaction_amount
+
+        account.save()
+
+        # Redirect back to the checking account page after the transaction is processed
+        if account_type == 'checking':
+            return redirect('checkingaccount')
+        if account_type == 'savings':
+            return redirect('savingsaccount')
+
+    return render(request, 'bankingApp/make_transaction.html')

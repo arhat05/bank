@@ -35,6 +35,7 @@ class Account(models.Model):
     customer_id = models.ForeignKey(Customer, on_delete=models.CASCADE, default=1)
     overdraft_lim = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     interest_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    credit_limit = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     
 
 class Loan(models.Model):
@@ -96,7 +97,7 @@ class CreditCard(models.Model):
     transaction_desc = models.CharField(max_length=100)
     last_payment_date = models.DateField()
     next_payment_date = models.DateField()
-    credit_limit = models.DecimalField(max_digits=10, decimal_places=2)
+    #credit_limit = models.DecimalField(max_digits=10, decimal_places=2)
     minimum_payment = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 

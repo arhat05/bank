@@ -10,5 +10,6 @@ urlpatterns = [
     path('checkingaccount', views.checkingaccount, name='checkingaccount'),
     path('savingsaccount', views.savingsaccount, name='savingsaccount'),
     path('creditcard', views.creditcard, name='creditcard'),
-    
+    path('loan', views.loan, name='loan'),
+    path('make_transaction/', views.make_transaction, name='make_transaction'),
 ]
