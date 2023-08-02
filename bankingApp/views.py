@@ -235,12 +235,33 @@ def checkingaccount(request):
     account.balance = balance
     account.save()
     
+    
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Convert the start and end dates to Python date objects
+    if start_date:
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+    # Apply date filtering if start_date and end_date are valid
+    if start_date and end_date:
+        transactions = transactions.filter(transaction_date__range=[start_date, end_date])
+    elif start_date:
+        transactions = transactions.filter(transaction_date__gte=start_date)
+    elif end_date:
+        transactions = transactions.filter(transaction_date__lte=end_date)
+    
+    
     # paginate transactions 25 per page
     paginator = Paginator(transactions, 25) 
 
     # get current page number
     page = request.GET.get('page')
     transactions = paginator.get_page(page)
+    
+    
 
     return render(request, 'bankingApp/checkingaccount.html', {'account': account, 'transactions': transactions})
 
@@ -263,6 +284,32 @@ def savingsaccount(request):
     balance += interest
     account.balance = balance
     
+    
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    # Convert the start and end dates to Python date objects
+    if start_date:
+        start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+    # Apply date filtering if start_date and end_date are valid
+    if start_date and end_date:
+        transactions = transactions.filter(transaction_date__range=[start_date, end_date])
+    elif start_date:
+        transactions = transactions.filter(transaction_date__gte=start_date)
+    elif end_date:
+        transactions = transactions.filter(transaction_date__lte=end_date)
+    
+    
+    # paginate transactions 25 per page
+    paginator = Paginator(transactions, 25) 
+
+    # get current page number
+    page = request.GET.get('page')
+    transactions = paginator.get_page(page)
+    
 
     return render(request, 'bankingApp/savingsaccount.html', {'account': account, 'transactions': transactions})
 
@@ -276,9 +323,11 @@ def creditcard(request):
     balance = account.balance
     for transaction in transactions:
         if transaction.transaction_type == 'credit':
-            balance += transaction.transaction_amount
-        elif transaction.transaction_type == 'debit':
             balance -= transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            balance += transaction.transaction_amount
+            
+    
     
     
     account.balance = balance

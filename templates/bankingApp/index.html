@@ -54,10 +54,21 @@
         }
 
         .card {
-            width: 400px;
+            width: 600px;
             height: 130px;
             margin: 5px;
         }
+
+        .card:hover {
+            transform: scale(1.03); /* Increase card size on hover */
+            font-weight: bold; /* Make text bold on hover */
+        }
+
+        .card-title, 
+        .card-text {
+        margin-bottom: 0;
+        }
+
 
         /* Center the content */
         body {
@@ -109,7 +120,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Checking Account</h5>
-                    <p class="card-text">Balance: ${{ checking_account_balance }}</p>
+                    <p style="font-size: 25px;" class="card-text text-right"> ${{ checking_account_balance }}</p>
                     <p class="card-text">Account Number: {{ checking_account_num }}</p>
                     <!--<a href="/checkingaccount" class="btn btn-primary">View Details</a> -->
                 </div>
@@ -120,7 +131,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Savings Account</h5>
-                    <p class="card-text">Balance: ${{ savings_account_balance }}</p>
+                    <p style="font-size: 25px;" class="card-text text-right"> ${{ savings_account_balance }}</p>
                     <p class="card-text">Account Number: {{ savings_account_num }}</p>
                     <!--<a href="/savingsaccount" class="btn btn-primary">View Details</a> -->
                 </div>
@@ -131,7 +142,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Credit Card</h5>
-                    <p class="card-text">Balance: ${{ cc_account_balance }}</p>
+                    <p style="font-size: 25px;" class="card-text text-right"> ${{ cc_account_balance }}</p>
                     <p class="card-text">Account Number: {{ cc_account_num }}</p>
                     <!-- <a href="/creditcard" class="btn btn-primary">View Details</a> -->
                 </div>
@@ -142,7 +153,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Loan Account</h5>
-                    <p class="card-text">Balance: ${{ loan_account_balance }}</p>
+                    <p style="font-size: 25px;" class="card-text text-right"> ${{ loan_account_balance }}</p>
                     <p class="card-text">Account Number: {{ loan_account_num }}</p>
                     <!-- <a href="/checkingaccount" class="btn btn-primary">View Details</a> -->
                 </div>
