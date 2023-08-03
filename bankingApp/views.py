@@ -350,9 +350,9 @@ def creditcard(request):
     balance = 0
     for transaction in transactions:
         if transaction.transaction_type == 'credit':
-            balance -= transaction.transaction_amount
-        elif transaction.transaction_type == 'debit':
             balance += transaction.transaction_amount
+        elif transaction.transaction_type == 'debit':
+            balance -= transaction.transaction_amount
             
     
     account.balance = balance
@@ -458,6 +458,13 @@ def make_transaction(request):
                                 transaction_type=transaction_type,
                                 transaction_amount=transaction_amount)
             transaction.save()
+                    # Update the account balance based on the new transaction
+            if transaction.transaction_type == 'credit':
+                account.balance += transaction.transaction_amount
+            elif transaction.transaction_type == 'debit':
+                account.balance -= transaction.transaction_amount
+
+            account.save()
             
         elif account_type == 'savings':
             transaction = Saving(account_number=account,
@@ -466,19 +473,40 @@ def make_transaction(request):
                                 transaction_type=transaction_type,
                                 transaction_amount=transaction_amount)
             transaction.save()
+                    # Update the account balance based on the new transaction
+            if transaction.transaction_type == 'credit':
+                account.balance += transaction.transaction_amount
+            elif transaction.transaction_type == 'debit':
+                account.balance -= transaction.transaction_amount
 
-        # Update the account balance based on the new transaction
-        if transaction.transaction_type == 'credit':
-            account.balance += transaction.transaction_amount
-        elif transaction.transaction_type == 'debit':
-            account.balance -= transaction.transaction_amount
+            account.save()
+        elif account_type == 'credit_card':
+            
+            if transaction_amount + account.balance > account.credit_limit and transaction_type == 'credit':
+                messages.error(request, 'Transaction amount exceeds credit limit!')
+                return redirect('creditcard')
+            else: 
+                transaction = CreditCard(account_number=account, 
+                                        transaction_date=transaction_date,
+                                        transaction_desc=f"{transaction_desc}",
+                                        transaction_type=transaction_type,
+                                        transaction_amount=transaction_amount)
+                transaction.save()
+                
+                if transaction.transaction_type == 'credit':
+                    account.balance -= transaction.transaction_amount
+                elif transaction.transaction_type == 'debit':
+                    account.balance += transaction.transaction_amount
+                
+                account.save()
 
-        account.save()
 
         # Redirect back to the checking account page after the transaction is processed
         if account_type == 'checking':
             return redirect('checkingaccount')
         if account_type == 'savings':
             return redirect('savingsaccount')
+        if account_type == 'credit_card':
+            return redirect('creditcard')
 
     return render(request, 'bankingApp/make_transaction.html')

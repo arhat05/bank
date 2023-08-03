@@ -95,10 +95,10 @@ class CreditCard(models.Model):
     transaction_amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     transaction_desc = models.CharField(max_length=100)
-    last_payment_date = models.DateField()
-    next_payment_date = models.DateField()
+    last_payment_date = models.DateField(null=True)
+    next_payment_date = models.DateField(null=True)
     #credit_limit = models.DecimalField(max_digits=10, decimal_places=2)
-    minimum_payment = models.DecimalField(max_digits=10, decimal_places=2)
+    minimum_payment = models.DecimalField(max_digits=10, decimal_places=2, default=100)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 
     

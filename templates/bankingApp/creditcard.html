@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credit Card Account</title>
+    <title>Credit Card</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         /* Custom CSS to center and space out the pagination items */
@@ -37,12 +37,29 @@
             color: #ffffff; /* Set text color to white */
             text-decoration: none; /* Remove underline from links */
         }
+
+        /* Custom CSS for stacking form elements */
+        .modal-body form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Adjust the gap as needed to add spacing between elements */
+        }
     </style>
 </head>
 <body>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <strong>Message: </strong> {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+
     <div class="container">
         <h3 class="">Credit Card</h3>
         <h4 class="">Balance: ${{ account.balance }}</h4>
+        <h4 class="">Credit Limit: ${{ account.credit_limit }}</h4>
 
         <form method="GET" action="">
             <label for="start_date">Start Date:</label>
@@ -53,6 +70,47 @@
         
             <button class = "regular-button" type="submit">Filter</button>
         </form>
+
+        <!-- Add a button to trigger the modal form -->
+        <button class="regular-button" data-toggle="modal" data-target="#transactionModal">Make Transaction</button>
+
+        <div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="transactionModalLabel">Make Transaction</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{% url 'make_transaction' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="account_type" value="{{ account.account_type }}">
+                            
+                            <label for="transaction_amount">Transaction Amount:</label>
+                            <input type="number" name="transaction_amount" id="transaction_amount" required>
+        
+                            <label for="transaction_description">Transaction Description:</label>
+                            <input type="text" name="transaction_description" id="transaction_description" required>
+        
+                            <label for="transaction_date">Transaction Date:</label>
+                            <input type="date" name="transaction_date" id="transaction_date" required>
+        
+                            <label for="transaction_type">Transaction Type:</label>
+                            <select name="transaction_type" id="transaction_type" required>
+                                <option value="credit">Spend</option>
+                                <option value="debit">Pay</option>
+                                
+                            </select>
+        
+                            <button class="regular-button" type="submit">Make Transaction</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
 
         <div class="table-responsive text-center"> <!-- Add "text-center" to center the table -->
             <table class="table table-bordered"> <!-- Add "table-bordered" to add a border to the table -->
