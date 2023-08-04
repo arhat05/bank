@@ -28,38 +28,40 @@ def dashboard(request):
         checking_transactions = Check.objects.filter(account_number=checking_account_num)
         checking_account_balance = checking_acc.balance
         
-        running_balance = 0
+        # running_balance = 0
         
-        for transaction in checking_transactions:
-            if transaction.transaction_type == 'credit':
-                running_balance += transaction.transaction_amount
-            elif transaction.transaction_type == 'debit':
-                running_balance -= transaction.transaction_amount
+        # for transaction in checking_transactions:
+        #     if transaction.transaction_type == 'credit':
+        #         running_balance += transaction.transaction_amount
+        #     elif transaction.transaction_type == 'debit':
+        #         running_balance -= transaction.transaction_amount
         
-        checking_acc.balance = running_balance
-        checking_acc.save()
+        # checking_acc.balance = running_balance
+        # checking_acc.save()
         
         
 
         
                 
-        savings_account_num = savings_acc.account_number
-        savings_account_balance = savings_acc.balance
-        savings_transactions = Saving.objects.filter(account_number=savings_account_num)
+        # savings_account_num = savings_acc.account_number
+        # savings_account_balance = savings_acc.balance
+        # savings_transactions = Saving.objects.filter(account_number=savings_account_num)
         
-        for transaction in savings_transactions:
-            if transaction.transaction_type == 'credit':
-                savings_account_balance += transaction.transaction_amount
-            elif transaction.transaction_type == 'debit':
-                savings_account_balance -= transaction.transaction_amount
+        # running_balance = 0
+        
+        # for transaction in savings_transactions:
+        #     if transaction.transaction_type == 'credit':
+        #         savings_account_balance += transaction.transaction_amount
+        #     elif transaction.transaction_type == 'debit':
+        #         savings_account_balance -= transaction.transaction_amount
         
         
         return render(request, 'bankingApp/index.html', {
             'first_name': first_name,
             'checking_account_num': checking_account_num,
             'checking_account_balance': checking_account_balance,
-            'savings_account_num': savings_account_num,
-            'savings_account_balance': savings_account_balance,
+            'savings_account_num': savings_acc.account_number,
+            'savings_account_balance': savings_acc.balance,
             'cc_account_num': cc_acc.account_number,
             'cc_account_balance': cc_acc.balance,
             'loan_account_num': loan_acc.account_number,
@@ -295,7 +297,7 @@ def checkingaccount(request):
 def savingsaccount(request):
     account = Account.objects.get(account_type="savings", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
     accNum = account.account_number
-    transactions = Saving.objects.filter(account_number=accNum)
+    transactions = Saving.objects.filter(account_number=accNum).order_by('-transaction_date')
     
     #set the account balance to the sum of all transactions and the initial balance
     
@@ -343,7 +345,7 @@ def savingsaccount(request):
 def creditcard(request):
     account = Account.objects.get(account_type="credit_card", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
     accNum = account.account_number
-    transactions = CreditCard.objects.filter(account_number=accNum)
+    transactions = CreditCard.objects.filter(account_number=accNum).order_by('-transaction_date')
     
     #set the account balance to the sum of all transactions and the initial balance
     
@@ -392,7 +394,7 @@ def loan(request):
     
     account = Account.objects.get(account_type="loan", customer_id=(Customer.objects.get(username=request.user.username)).customer_id)
     accNum = account.account_number
-    transactions = CreditCard.objects.filter(account_number=accNum)
+    transactions = CreditCard.objects.filter(account_number=accNum).order_by('-transaction_date')
     
     #set the account balance to the sum of all transactions and the initial balance
     

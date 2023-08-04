@@ -26,7 +26,7 @@
         }
 
         .regular-button:hover {
-            transform: scale(1.1); /* Increase button size on hover */
+            transform: scale(1.02); /* Increase button size on hover */
         }
 
         .regular-button:hover a {
@@ -78,7 +78,7 @@
                                 <input type="hidden" name="account_type" value="{{ account.account_type }}">
     
                                 <label for="transaction_amount">Transaction Amount:</label>
-                                <input type="number" name="transaction_amount" id="transaction_amount" required>
+                                <input type="number" step="any" name="transaction_amount" id="transaction_amount" required>
             
                                 <label for="transaction_description">Transaction Description:</label>
                                 <input type="text" name="transaction_description" id="transaction_description" required>
