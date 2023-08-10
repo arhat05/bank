@@ -82,10 +82,10 @@ def dashboard(request):
         if len(amount_spent) > 2 and amount_spent.keys()[0] != 'other' and amount_spent.keys()[1] != 'other':
             top2.append(amount_spent.keys()[0])
             top2.append(amount_spent.keys()[1])
-        elif len(amount_spent > 2) and amount_spent.keys()[0] == 'other':
+        elif len(amount_spent) > 2 and amount_spent.keys()[0] == 'other':
             top2.append(amount_spent.keys()[1])
             top2.append(amount_spent.keys()[2])
-        elif len(amount_spent > 2) and amount_spent.keys()[1] == 'other':
+        elif len(amount_spent) > 2 and amount_spent.keys()[1] == 'other':
             top2.append(amount_spent.keys()[0])
             top2.append(amount_spent.keys()[2])
         
