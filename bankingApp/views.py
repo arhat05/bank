@@ -101,9 +101,9 @@ def dashboard(request):
             else:
                 promos = Promotion.objects.filter(promotion_desc = top2[0]) | Promotion.objects.filter(promotion_desc = top2[1])
            
-        print(amount_spent) 
-        print(top2)
-        print(promos)
+        # print(amount_spent) 
+        # print(top2)
+        # print(promos)
         
         return render(request, 'bankingApp/index.html', {
             'first_name': first_name,
@@ -274,6 +274,45 @@ def login(request):
             loan_acc.balance = running_balance
             loan_acc.save()
             
+            total_transactions = chain((Check.objects.filter(account_number=checking_account_num, transaction_type = "debit").values('transaction_amount', 'transaction_desc')), 
+                                       (Saving.objects.filter(account_number=savings_account_num, transaction_type = "debit").values('transaction_amount', 'transaction_desc')), 
+                                       (CreditCard.objects.filter(account_number=cc_acc_num, transaction_type = "credit").values('transaction_amount', 'transaction_desc')))
+            
+            amount_spent = {}
+            for transaction in total_transactions:
+                if transaction['transaction_desc'] in amount_spent:
+                    amount_spent[transaction['transaction_desc']] += transaction['transaction_amount']
+                else:
+                    amount_spent[transaction['transaction_desc']] = transaction['transaction_amount']
+            
+            # sort the dictionary by value (amount spent) in descending order
+            amount_spent = dict(sorted(amount_spent.items(), key=lambda item: item[1], reverse=True))
+            
+            top2 = []
+            
+            if (amount_spent):
+                if len(amount_spent) >= 2 and list(amount_spent.keys())[0] != 'other' and list(amount_spent.keys())[1] != 'other':
+                    top2.append(list(amount_spent.keys())[0])
+                    top2.append(list(amount_spent.keys())[1])
+                elif len(amount_spent) >= 2 and list(amount_spent.keys())[0] == 'other':
+                    top2.append(list(amount_spent.keys())[1])
+                    top2.append(list(amount_spent.keys())[2])
+                elif len(amount_spent) > 2 and list(amount_spent.keys())[1] == 'other':
+                    top2.append(list(amount_spent.keys())[0])
+                    top2.append(list(amount_spent.keys())[2])
+                elif len (amount_spent) == 1 and list(amount_spent.keys())[0] != 'other':
+                    top2.append(list(amount_spent.keys())[0])
+                else:
+                    top2.append(list(amount_spent.keys())[0])
+                    
+                    
+            if top2:
+                if len(top2) == 1:
+                    promos = Promotion.objects.filter(promotion_desc = top2[0])
+                else:
+                    promos = Promotion.objects.filter(promotion_desc = top2[0]) | Promotion.objects.filter(promotion_desc = top2[1])
+            
+            
             return render(request, 'bankingApp/index.html', {
                 'first_name': first_name,
                 'checking_account_num': checking_account_num,
@@ -283,7 +322,8 @@ def login(request):
                 'cc_account_num': cc_acc_num,
                 'cc_account_balance': cc_acc_balance,
                 'loan_account_num': loan_acc_num,
-                'loan_account_balance': loan_acc_balance
+                'loan_account_balance': loan_acc_balance,
+                'promos': promos
             })
 
         else:
