@@ -101,4 +101,9 @@ class CreditCard(models.Model):
     minimum_payment = models.DecimalField(max_digits=10, decimal_places=2, default=100)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 
-    
+
+class Promotions(models.Model):
+    promotion_id = models.AutoField(primary_key=True)
+    promotion_name = models.CharField(max_length=50)
+    promotion_desc = models.CharField(max_length=100)
+    promotion_details = models.CharField(max_length=100)

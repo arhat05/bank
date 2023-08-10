@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, logout
 from django.contrib.auth import login as auth_login
 from django.core.paginator import Paginator
 from decimal import Decimal
+from itertools import chain
 
 # Create your views here.
 
@@ -25,7 +26,7 @@ def dashboard(request):
         
         
         checking_account_num = checking_acc.account_number
-        checking_transactions = Check.objects.filter(account_number=checking_account_num)
+        checking_transactions = Check.objects.filter(account_number=checking_account_num).values('transaction_amount', 'transaction_desc')
         checking_account_balance = checking_acc.balance
         
         # running_balance = 0
@@ -43,9 +44,12 @@ def dashboard(request):
 
         
                 
-        # savings_account_num = savings_acc.account_number
-        # savings_account_balance = savings_acc.balance
-        # savings_transactions = Saving.objects.filter(account_number=savings_account_num)
+        savings_account_num = savings_acc.account_number
+        savings_account_balance = savings_acc.balance
+        savings_transactions = Saving.objects.filter(account_number=savings_account_num).values('transaction_amount', 'transaction_desc')
+        
+        
+        
         
         # running_balance = 0
         
@@ -54,6 +58,38 @@ def dashboard(request):
         #         savings_account_balance += transaction.transaction_amount
         #     elif transaction.transaction_type == 'debit':
         #         savings_account_balance -= transaction.transaction_amount
+        
+        
+        cc_acc_num = cc_acc.account_number
+        cc_transactions = CreditCard.objects.filter(account_number=cc_acc_num).values('transaction_amount', 'transaction_desc')
+        
+
+        
+        # get top 2 transaction categories by amount spent in the last 30 days for all accounts
+        transactions = chain(checking_transactions, savings_transactions, cc_transactions)
+        amount_spent = {}
+        for transaction in transactions:
+            if transaction['transaction_desc'] in amount_spent:
+                amount_spent[transaction['transaction_desc']] += transaction['transaction_amount']
+            else:
+                amount_spent[transaction['transaction_desc']] = transaction['transaction_amount']
+        
+        # sort the dictionary by value (amount spent) in descending order
+        amount_spent = dict(sorted(amount_spent.items(), key=lambda item: item[1], reverse=True))
+        
+        top2 = []
+        
+        if len(amount_spent) > 2 and amount_spent.keys()[0] != 'other' and amount_spent.keys()[1] != 'other':
+            top2.append(amount_spent.keys()[0])
+            top2.append(amount_spent.keys()[1])
+        elif len(amount_spent > 2) and amount_spent.keys()[0] == 'other':
+            top2.append(amount_spent.keys()[1])
+            top2.append(amount_spent.keys()[2])
+        elif len(amount_spent > 2) and amount_spent.keys()[1] == 'other':
+            top2.append(amount_spent.keys()[0])
+            top2.append(amount_spent.keys()[2])
+        
+        
         
         
         return render(request, 'bankingApp/index.html', {
@@ -149,9 +185,10 @@ def login(request):
         
         user = authenticate(username=username, password=password)
         
-        customer = Customer.objects.get(username=username)
+        
         
         if user is not None:
+            customer = Customer.objects.get(username=username)
             auth_login(request, user)
             first_name = user.first_name
             
