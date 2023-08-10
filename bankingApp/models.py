@@ -102,7 +102,7 @@ class CreditCard(models.Model):
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, default='debit')
 
 
-class Promotions(models.Model):
+class Promotion(models.Model):
     promotion_id = models.AutoField(primary_key=True)
     promotion_name = models.CharField(max_length=50)
     promotion_desc = models.CharField(max_length=100)

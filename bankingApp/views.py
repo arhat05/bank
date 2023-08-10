@@ -26,7 +26,7 @@ def dashboard(request):
         
         
         checking_account_num = checking_acc.account_number
-        checking_transactions = Check.objects.filter(account_number=checking_account_num).values('transaction_amount', 'transaction_desc')
+        checking_transactions = Check.objects.filter(account_number=checking_account_num, transaction_type = "debit").values('transaction_amount', 'transaction_desc')
         checking_account_balance = checking_acc.balance
         
         # running_balance = 0
@@ -46,7 +46,7 @@ def dashboard(request):
                 
         savings_account_num = savings_acc.account_number
         savings_account_balance = savings_acc.balance
-        savings_transactions = Saving.objects.filter(account_number=savings_account_num).values('transaction_amount', 'transaction_desc')
+        savings_transactions = Saving.objects.filter(account_number=savings_account_num, transaction_type = "debit").values('transaction_amount', 'transaction_desc')
         
         
         
@@ -61,7 +61,7 @@ def dashboard(request):
         
         
         cc_acc_num = cc_acc.account_number
-        cc_transactions = CreditCard.objects.filter(account_number=cc_acc_num).values('transaction_amount', 'transaction_desc')
+        cc_transactions = CreditCard.objects.filter(account_number=cc_acc_num, transaction_type = "credit").values('transaction_amount', 'transaction_desc')
         
 
         
@@ -79,18 +79,31 @@ def dashboard(request):
         
         top2 = []
         
-        if len(amount_spent) > 2 and amount_spent.keys()[0] != 'other' and amount_spent.keys()[1] != 'other':
-            top2.append(amount_spent.keys()[0])
-            top2.append(amount_spent.keys()[1])
-        elif len(amount_spent) > 2 and amount_spent.keys()[0] == 'other':
-            top2.append(amount_spent.keys()[1])
-            top2.append(amount_spent.keys()[2])
-        elif len(amount_spent) > 2 and amount_spent.keys()[1] == 'other':
-            top2.append(amount_spent.keys()[0])
-            top2.append(amount_spent.keys()[2])
-        
-        
-        
+        if (amount_spent):
+            if len(amount_spent) >= 2 and list(amount_spent.keys())[0] != 'other' and list(amount_spent.keys())[1] != 'other':
+                top2.append(list(amount_spent.keys())[0])
+                top2.append(list(amount_spent.keys())[1])
+            elif len(amount_spent) >= 2 and list(amount_spent.keys())[0] == 'other':
+                top2.append(list(amount_spent.keys())[1])
+                top2.append(list(amount_spent.keys())[2])
+            elif len(amount_spent) > 2 and list(amount_spent.keys())[1] == 'other':
+                top2.append(list(amount_spent.keys())[0])
+                top2.append(list(amount_spent.keys())[2])
+            elif len (amount_spent) == 1 and list(amount_spent.keys())[0] != 'other':
+                top2.append(list(amount_spent.keys())[0])
+            else:
+                top2.append(list(amount_spent.keys())[0])
+                
+                
+        if top2:
+            if len(top2) == 1:
+                promos = Promotion.objects.filter(promotion_desc = top2[0])
+            else:
+                promos = Promotion.objects.filter(promotion_desc = top2[0]) | Promotion.objects.filter(promotion_desc = top2[1])
+           
+        print(amount_spent) 
+        print(top2)
+        print(promos)
         
         return render(request, 'bankingApp/index.html', {
             'first_name': first_name,
@@ -101,7 +114,8 @@ def dashboard(request):
             'cc_account_num': cc_acc.account_number,
             'cc_account_balance': cc_acc.balance,
             'loan_account_num': loan_acc.account_number,
-            'loan_account_balance': loan_acc.balance
+            'loan_account_balance': loan_acc.balance,
+            'promos': promos
         })
         
     

@@ -102,6 +102,9 @@
         border-radius: 10px;
         padding: 20px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        max-height: 500px; /* Set a maximum height for the panel */
+        overflow-y: auto; /* Allow vertical scrolling when content overflows */
+        text-align: center;
     }
 
     .panel-heading {
@@ -110,6 +113,20 @@
         margin: 0;
         padding-bottom: 10px;
         border-bottom: 1px solid #ddd;
+        margin-bottom: 20px; /* Add some spacing below the heading */
+    }
+    .promo-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .promo-card {
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 10px; /* Add rounded edges */
     }
     </style>
 </head>
@@ -143,10 +160,19 @@
     <div class="button-container">
         {% if user.is_authenticated %}
 
-        <!-- offers and promotions-->
-        <div class ="panel">
-            <h3>Offers and Promotions</h3>
+        {% if promos %}
+        <div class="panel">
+            <h3 class="panel-heading">Offers and Promotions</h3>
+            <div class="promo-cards">
+                {% for promo in promos %}
+                    <div class="promo-card">
+                        <h4>{{ promo.promotion_name }}</h4>
+                        <p>{{ promo.promotion_details }}</p>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
+    {% endif %}
 
         <div class="d-flex flex-column card-container">
 
