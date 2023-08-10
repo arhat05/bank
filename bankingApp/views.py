@@ -95,6 +95,8 @@ def dashboard(request):
                 top2.append(list(amount_spent.keys())[0])
                 
                 
+                
+                
         if top2:
             if len(top2) == 1:
                 promos = Promotion.objects.filter(promotion_desc = top2[0])
